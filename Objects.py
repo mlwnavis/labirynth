@@ -6,7 +6,7 @@ import Labirynth
 import bfs as bfe
 
 Creatures = {"Garil":{"stats":{"WW":39, "US":31, "K":40,"ODP":43,"ZR":16,"CHA":26,
-                       "A":2,"S":4,"HP":14,"WT":4},'type': 'hero', "gold":5,"eq":[]},
+                       "A":2,"S":4,"HP":14,"WT":4},'type': 'hero', "gold":5,"eq":["Miecz oburęczny"]},
              "Goblin":{"stats":{"WW":25, "US":30, "K":30,"ODP":30,"ZR":25,"SW":20,
                         "A":1,"S":3,"HP":8,"WT":3},'type': 'humanoid', "diff": 1, "desc":"Opis"},
              "Zombi":{"stats":{"WW":25, "US":0, "K":35,"ODP":35,"ZR":10,"SW":0,
@@ -70,9 +70,10 @@ def dice(d):
 
 class Generator:
 
-    def __init__(self, p_chest = 0.2, p_enemy = 0.35):
+    def __init__(self, p_chest = 0.2, p_enemy = 0.35, floors = 3):
         self.p_chest = p_chest
         self.p_enemy = p_enemy
+        self.floors = floors
 
     def generate_chest(self):
         if random.uniform(0,1) <= self.p_chest:
@@ -125,19 +126,19 @@ class Generator:
 
     def generate_floor(self):
         changes = {"N":(0,1), "S":(0,-1), "W":(-1,0), "E":(1,0)}
-        rooms = {}
+
         def generate_corridor(room, len, p_shop):
             if len != 0:
                 neighbours = room.get_neighbours()
                 directions = [direction for direction in Labirynth.Directions if direction not in neighbours and
-                          direction not in ["UP", "DOWN"]]
+                          direction not in ["Up", "Down"]]
                 if directions != []:
 
                     cur_cords = room.get_coords()
                     direction = random.sample(directions, k=1)[0]
                     change = changes[direction]
                     new_cords = (cur_cords[0] + change[0], cur_cords[1] + change[1])
-                    if len == 1 and shop == False and p_shop == 1:
+                    if len == 2 and shop == False and p_shop == 1:
 
                         new_room = self.generate_shop(coordinates=new_cords)
                     else:
@@ -169,15 +170,26 @@ class Generator:
 
         floor = Labirynth.Labirynth()
         starting_room = Labirynth.Room((0,0))
-        rooms[(0, 0)] = starting_room
         floor.add_room(starting_room, [])
-        shop = False
-        n_of_directions = random.randint(2,4)
-        for n in range(n_of_directions):
-            generate_corridor(starting_room,4, (n+1)/n_of_directions)
+        for fl in range(self.floors):
+            rooms = {}
+            shop = False
+            n_of_directions = random.randint(2, 4)
+            rooms[(0, 0)] = starting_room
+            for n in range(n_of_directions):
+                generate_corridor(starting_room, fl + 4, (n + 1) / n_of_directions)
+            last_room = longest_path()
+            last_room.set_staircase()
+            print(last_room)
+            new_start = Labirynth.Room((0,0))
+            new_start.set_staircase()
+
+            floor.add_room(new_start, [[last_room,"Up"]])
+            print(new_start.get_neighbours())
+            starting_room = new_start
 
 
-        longest_path().set_staircase()
+
         return floor
 
 

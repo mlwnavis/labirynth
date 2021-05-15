@@ -4,7 +4,7 @@ import Tools
 from copy import copy
 IO = Tools.IO()
 
-Directions = {"N":"S", "S":"N","E":"W","W":"E", "UP":"DOWN", "DOWN":"UP"}
+Directions = {"N":"S", "S":"N","E":"W","W":"E", "Up":"Down", "Down":"Up"}
 
 
 class Actions:
@@ -337,6 +337,7 @@ class Labirynth:
         IO.start()
         actions = act
         Actions_dict = {"N": actions.move, "S": actions.move, "W": actions.move, "E": actions.move,
+                        "Down": actions.move, "Up": actions.move,
                         "Walcz": actions.fight, "Kup": actions.buy, "Rozejrzyj": actions.examine,
                         "Podnieś": actions.pick_up, "Otwórz": actions.open, "Ekwipuj": actions.equip,
                         "Pomoc": actions.help, "Pokaż": actions.show}
@@ -345,10 +346,10 @@ class Labirynth:
 
         while True:
             IO.show_neighbours(self.cur_room)
-            action = IO.action().split()
+            action = IO.action().capitalize().split()
             while len(action) < 1:
-                action = IO.action().split()
-            activity = action[0].capitalize()
+                action = IO.action().capitalize().split()
+            activity = action[0]
             if activity in Actions_dict:
                 Actions_dict[activity](self.cur_room, action)
             else:

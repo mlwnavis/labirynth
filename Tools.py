@@ -27,9 +27,8 @@ class IO:
             print("Na ziemi leży {} złota.".format(gold))
 
         elif staircase is True:
-            direction = "w górę" if "UP" in room.get_neighbours() else "w dół"
+            direction = "w górę" if "Up" in room.get_neighbours() else "w dół"
             print("W pomieszczeniu widzisz schody prowadzące {}".format(direction))
-            print("Koniec dema, zajebiste, wiem.")
 
         elif enemy is not None:
             if enemy.get_equipped() is None:

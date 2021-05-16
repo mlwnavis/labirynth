@@ -1,9 +1,11 @@
 from time import sleep
 
-#class Generator:
 
-
-
+Weapons = {"Sztylet":{'type':'weapon',"price": 7, 'dmg':-2},
+         "Miecz jednoręczny":{'type': "weapon",'price':10, 'dmg':0},
+         "Miecz oburęczny":{'type': "weapon",'price':20, 'dmg':2},
+         "Kij":{'type': "weapon",'price':5, 'dmg':-3},
+         "Korbacz":{'type': "weapon",'price':15, 'dmg':1}}
 
 class IO:
 
@@ -17,22 +19,27 @@ class IO:
     def examine_room(self, room, enemy, shop, staircase, gold):
         print("-----")
         ground, chest = room.get_ground(), room.get_chest()
+        anything = False
 
         if shop is True:
+            anything = True
             print("Wchodzisz do sklepu. Na półkach widzisz:")
             for item in ground:
                 print("-{} Cena: {}".format(item, item.get_price()))
 
-        elif gold > 0:
+        if gold > 0:
+            anything = True
             print("Na ziemi leży {} złota.".format(gold))
 
-        elif staircase is True:
+        if staircase is True:
+            anything = True
             direction = "w górę" if "Up" in room.get_neighbours() else "w dół"
             print("W pomieszczeniu widzisz schody prowadzące {}".format(direction))
 
-        elif enemy is not None:
+        if enemy is not None:
+            anything = True
             if enemy.get_equipped() is None:
-                print("Po pokoju przechadza się {} bez żadnej broni.".format(enemy).capitalize())
+                print("Po pokoju przechadza się {}.".format(enemy).capitalize())
             else:
                 print("Po pokoju przechadza się {}, dzierży {}.".format(enemy, enemy.get_equipped()).capitalize())
             if not enemy.is_aware():
@@ -41,16 +48,18 @@ class IO:
                         enemy))
             else:
                 print("{} atakuje Cię!".format(enemy))
-        elif ground and not shop:
+        if ground and not shop:
+            anything = True
             print("Na ziemii leżą: ")
             for item in ground:
                 print("-{} ".format(item))
-        elif chest is not None:
+        if chest is not None:
+            anything = True
             if chest.get_opened():
                 print("W pokoju dostrzegasz otwartą wcześniej skrzynię.")
             else:
                 print("W pokoju dostrzegasz skrzynię.")
-        else:
+        if not anything:
             print("W pokoju nie ma nic ciekawego.")
 
 
@@ -146,12 +155,17 @@ class IO:
             print("Ekwipunek {}:".format(player))
             for item in player.get_equipment():
                 print("-{}".format(item))
+                if str(item) in Weapons:
+                    print("Obrażenia: {}, Wymagania: NULL\n".format(Weapons[str(item)]["dmg"]))
         else:
             print("Garil nie ma przy sobie niczego.\n")
 
     def show_equipped_weapon(self, player):
         print("-----")
-        print("{} dzierży {}".format(player, player.get_equipped()).capitalize())
+        if player.get_equipped() is None:
+            print("{} nie trzyma żadnej broni.".format(player))
+        else:
+            print("{} dzierży {}".format(player, player.get_equipped()).capitalize())
 
     def show_equipping(self, player, item):
         print("-----")
@@ -166,10 +180,10 @@ class IO:
         print("{} nie ma tego przedmiotu w ekwipunku.".format(player))
 
     #metody dla combatu
-    def show_hit(self, attacker, weapon, damage, effective_damage):
+    def show_hit(self, attacker, enemy, damage, effective_damage):
         print("-----")
         print("{} trafia {}! Zadaje {} obrażeń (zredukowane do {})."
-              .format(attacker, weapon, damage, effective_damage).capitalize())
+              .format(attacker, enemy, damage, effective_damage).capitalize())
 
     def show_no_hit(self, attacker):
         print("-----")

@@ -51,7 +51,7 @@ class Actions:
 
     def examine(self,room, action):
         if len(action) == 1:
-            shop = True if type(room) == Shop else False
+            shop = True if type(room) == s else False
             enemy = room.get_enemy()
             IO.examine_room(room, enemy, shop, room.get_staircase(), room.get_gold())
         else:
@@ -342,7 +342,7 @@ class Labirynth:
                         "Down": actions.move, "Up": actions.move,
                         "Walcz": actions.fight, "Kup": actions.buy, "Rozejrzyj": actions.examine,
                         "Podnieś": actions.pick_up, "Otwórz": actions.open, "Ekwipuj": actions.equip,
-                        "Pomoc": actions.help, "Pokaż": actions.show}
+                        "Pomoc": actions.help, "Pokaż": actions.show, "Zniszcz": actions.destroy}
         player = Objects.Player("Garil")
         actions.add_player(player)
 

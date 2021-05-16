@@ -247,7 +247,7 @@ class Combat:
                         weapon = self.cur_turn.get_equipped()
                         if weapon == None:
                             weapon = "Pięści"
-                        IO.show_hit(self.cur_turn, weapon, damage, effective_damage)
+                        IO.show_hit(self.cur_turn, self.next_turn, damage, effective_damage)
 
                         self.next_turn.lose_hit_points(effective_damage)
                         if self.next_turn.get_hit_points() <= 0:

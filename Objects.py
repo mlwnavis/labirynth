@@ -6,7 +6,7 @@ import Labirynth
 import bfs as bfe
 
 Creatures = {"Garil":{"stats":{"WW":39, "US":31, "K":40,"ODP":43,"ZR":16,"CHA":26,
-                       "A":2,"S":4,"HP":14,"WT":4},'type': 'hero', "gold":5,"eq":["Miecz oburęczny"]},
+                       "A":2,"S":4,"HP":14,"WT":4},'type': 'hero', "gold":5,"eq":[]},
              "Goblin":{"stats":{"WW":25, "US":30, "K":30,"ODP":30,"ZR":25,"SW":20,
                         "A":1,"S":3,"HP":8,"WT":3},'type': 'humanoid', "diff": 1, "desc":"Opis"},
              "Zombi":{"stats":{"WW":25, "US":0, "K":35,"ODP":35,"ZR":10,"SW":0,
@@ -74,6 +74,7 @@ class Generator:
         self.p_chest = p_chest
         self.p_enemy = p_enemy
         self.floors = floors
+        self.existing_floors = 0
 
     def generate_chest(self):
         if random.uniform(0,1) <= self.p_chest:
@@ -97,7 +98,7 @@ class Generator:
     def generate_monster(self):
         if random.uniform(0,1) <= self.p_enemy:
             monster = random.sample(list(Monsters), k=1)[0]
-            while Creatures[monster]['diff'] >= 3:
+            while Creatures[monster]['diff'] >= int(self.existing_floors/2) + 3:
                 monster = random.sample(list(Monsters), k=1)[0]
 
             weapon = None
@@ -119,8 +120,6 @@ class Generator:
         items = [Item(x) for x in tmp]
         return Labirynth.Shop(coordinates=coordinates, stock=items)
 
-
-
     def generate_room(self, coordinates):
         return Labirynth.Room(coordinates, chest=self.generate_chest(), enemy=self.generate_monster())
 
@@ -139,7 +138,6 @@ class Generator:
                     change = changes[direction]
                     new_cords = (cur_cords[0] + change[0], cur_cords[1] + change[1])
                     if len == 2 and shop == False and p_shop == 1:
-
                         new_room = self.generate_shop(coordinates=new_cords)
                     else:
                         new_room = self.generate_room(coordinates=new_cords)
@@ -183,12 +181,10 @@ class Generator:
             print(last_room)
             new_start = Labirynth.Room((0,0))
             new_start.set_staircase()
-
             floor.add_room(new_start, [[last_room,"Up"]])
             print(new_start.get_neighbours())
             starting_room = new_start
-
-
+            self.existing_floors += 1
 
         return floor
 
@@ -451,16 +447,13 @@ class Player(Creature):
         self.equipment.append(item)
 
     def equip_weapon(self, weapon):
-        if weapon in self.equipment and type(weapon) is Weapon:
-            if self.equipped is not None:
-                self.equipment.append(self.equipped)
-            self.equipment.remove(weapon)
-            self.equipped = weapon
-            IO.show_equipping(self.name, weapon)
-        elif weapon not in self.equipment:
-            IO.wrong_item(self.name)
-        else:
-            IO.wrong_action()
+
+        if self.equipped is not None:
+            self.equipment.append(self.equipped)
+        self.equipment.remove(weapon)
+        self.equipped = weapon
+        IO.show_equipping(self.name, weapon)
+
 
     def drop_item(self, item):
         if item in self.equipment:

@@ -136,9 +136,11 @@ class Actions:
             if thing in Objects.Items:
                 for item in self.player.get_equipment():
                     if str(item) == thing:
-                        got_it = True
-                        self.player.equip_weapon(item)
-                        break
+                        print(thing)
+                        if str(item) in Objects.Weapons:
+                            got_it = True
+                            self.player.equip_weapon(item)
+                            break
                 if not got_it:
                     IO.wrong_item(self.player)
             else:
@@ -197,7 +199,7 @@ class Actions:
         if len(action) == 1:
             IO.not_enough_info(action[0])
         else:
-            if type(room) == Shop:
+            if type(room) == s:
                 thing = " ".join(action[1:]).capitalize()
                 if thing in Objects.Items:
                     room.buy(self.player, thing)
@@ -288,7 +290,7 @@ class Shop(Room):
         got_it = False
         for offert in self.ground:
             if str(offert) == item:
-                if item.get_price() <= player.get_gold():
+                if price <= player.get_gold():
                     got_it = True
                     player.pay(price)
                     player.add_equipment(offert)
